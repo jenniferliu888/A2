@@ -1,0 +1,542 @@
+---
+title: 'US Birth Decline: Explained by the Recession, Social and Demographic Factors'
+author:
+- Zhiyi Liu
+- Jennifer Liu
+- Jiayi Wu
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  bookdown::pdf_document2: default
+abstract: As society continuously works towards gender equality, not having children may bring greater opportunities for women. In fact, the birth rate in the US is already on a declining trend. We examine the paper “The Puzzle of Falling US Birth Rates since the Great Recession” by Kearny, Levine and Pardue and replicate the study with the given datasets. The dataset used for this study was downloaded from the OPENICPSR website. This paper replicates the paper from macroeconomic, social, and demographic aspects that may explain the declining birth rates. The discussion section describes how The Great Recession, child care expenditures, female-male pay ratio and demographic group's contribution affect U.S birth rate from economic perspectives, such as, income effect, price effect and opportunity cost.  
+thanks: 'Code and data are available at: git@github.com:jenniferliu888/A2.git'
+toc: no
+bibliography: bibliographyy.bib
+---
+
+```{r setup, include=FALSE}
+library(haven)
+library(tidyverse)
+```
+
+# Introduction
+Birth rates provide valuable information about our community. It is also a critical metric in predicting the size of population and the workforce. Health experts also regularly watch birth rates as they increase and decline, and analyze these patterns to identify significant changes and their implications for the future of our society. Analysts are concerned that the declining birth rate would leave the US. with insufficient workforce to sustain its growth. "If we maintain 1.76, that is not a significant concern," says Bradford Wilcox, head of the National Marriage Project at the University of Virginia, a nonpartisan research organization that monitors family and childbearing patterns. "If fertility continues to fall, this will very certainly result in some significant social and economic issues."[@imlab].
+
+To replicate the paper “The Puzzle of Falling US Birth Rates since the Great Recession” by Kearny, Levine and Pardue [@paper], we replicate multiple plots to assess various factors and share our findings. We identify three major points from the original work. The first viewpoint is on the impact of The Great Recession on the reduction of the US birth rate from an economic standpoint of income effect. The second part examines certain social factors such as child care costs and the female-male wage ratio that contribute to the declining birth rate. The final perspective is based on demographic data and examines how the contributions of various demographic groups impact the US birth rate. A linear regression analysis was used to illustrate a portion of the outcome. All analyses based on the preceding three perspectives were explored in length in both the result section devoted to statistical findings and the discussion section devoted to extensive explanations.
+
+The dataset used for this paper was downloaded from the OPENICPSR [@openicpsr] website in order to replicate the original paper. OPENICPSR is an open platform where people can share and download research data. Authors have provided some processed data from multiple sources such as the National Center for Health Statistics’ (NCHS) restricted-use micro-data [@nchs], Vital Statistics Final Births report [@nvss] and the Current Population Survey Annual Social and Economic Supplement [@cps]. Due to the millions of survey results, we have mostly worked with processed data, which is a major limitation. 
+
+The paper examines the macro, social and demographic factors that may impact the declining birth rates. The result was that the birth rate was closely related with the Great Recession, but the causation relationship between income and fertility cannot be concluded. After conducting linear regression, both female-male wage ratio and the increasing cost of having a child has no significant correlation with birth rates. Most changes in the birth rate on a population level was not due to the structure of the population. It is related to changes within the demographic groups, the decline is most dramatic in hispanic teens. 
+
+The discussion section expands on what we discovered in the results section. Each point of contention will provide an explanation for the respective outcome. The sub-part income impact & normal goods describes the trend in the US birth rate during the Great Recession and attempts to evaluate the explanation for this trend from many economic angles.The sub-section Price Effect & Cost illustrates what we discover when we run a linear regression model on the subject of change in the female-male pay ratio and change in actual child care expenditures. In this part, we will attempt to explain the link between the fall in the US birth rate and a number of social problems using economic terminology, such as opportunity cost and price effect. Birth rates and the proportion of females of reproductive age have an influence on each demographic group's contribution. In the following part, we examined the effect of population change, fertility rates, and female population in each category on the total birth rate in the United States. Then the conclusions were made to talk about what are things we learned by this research and what we proceed in the future. Finally, some limitations regarding data and methods were illustrated to talk about the weakness and bias this paper may contain. Paper overview and literature review pass throughout the whole discussion part. 
+
+In any case, the aging population and the shrinking workforce pose challenges to economic growth and social security systems. Perceptions of the impact of a pro-natalist public agenda on birth rates even though some parts of that agenda may be desirable for other reasons. Investing in human capital and productivity-enhancing infrastructure is the best way to overcome declining US birth rates and secure Social Security and Medicare's long-term finances. 
+
+# Data
+This report is analyzed using R [@r], using tidyverse [@tidyverse] and dplyr [@dplyr] packages. All the tables and graphs are created using ggplot2 [@ggplot2] and the file is knitted using knitr [@knitr]. The package Haven is used to import .dta file [@haven]. 
+
+## Data source 
+In order to replicate the original paper, the dataset was downloaded from the OPENICPSR [@openicpsr] website, which is an open platform where people can share and download research data. ICPSR is part of the Institute for Social Research of the University of Michigan. 
+
+### Birth data
+All figures use birth data that was collected from public sources and the National Center for Health Statistics’ (NCHS) restricted-use microdata [@nchs]. Data used in figure 1 and 2 for women between 15-44 years old are collected from Vital Statistics Final Births report for 2015, 2019, and the 2020 Provisional Birth Report [@nvss]. The data is separated by age, marital status, Hispanic origin and state. In 2003, there was a revision of the U.S. Standard Certificate of Live Birth, which allows parents to report multiple races for children. This reform might have impacted the result. Data provided on the report is processed data due to the large number of births in the country, making it impossible to provide the raw file.  Data in the report are collected from birth certificates, where 99% of births in the United States are registered. A 1% missing data could heavily impact the result, which is a major limitation. 
+
+### Population data 
+To assess population by education, Hispanic origin by nativity, and marital status, we use data estimated from the Current Population Survey Annual Social and Economic Supplement (CPS ASEC) [@icps]. The paper also mentions the number of female Hispanic population of childbearing age, which is collected from the 2007 and 2018 American Community Survey. These data are obtained from IPUMS, which is a platform that preserves U.S. census data. 
+
+### Long-term changes data 
+Figure 6 and 8 show long term-changes in birth rates that are associated with social and economical trends. 
+Figure 6 uses data collected from the 2004-2008 and 2015-2019 American Community Survey, which calculates median wage and salary for full-time, full-year (FTFY) women and men by different states, working between 35 to 40 hours weekly. Then, the ratio is taken from these data to calculate the female-male median wage ratios. The data is obtained from IPUMS [@icps]. The American Community Survey randomly selects 3.5 millions addresses every year to respond to questions. It uses a series of scientific process sampling. Some of the variables include age, sex, marital status, computer and internet use, health insurance status and many more [@acs]. 
+
+Figure 8 uses data in self-reported childcare expenditure from the Current Population Survey Annual Social and Economic Supplement (CPS ASEC) (@cps), which was collected in the Supplemental Poverty Measure Module. Approximately 75,000 families with children of less than 12 years old annually respond to the survey, which aims to determine a families’ poverty status. It is in the best interest of the respondents to report higher childcare expenditure, resulting in a major bias. 
+
+Because both data are collected through surveys, there is a risk of non-response bias in which we do not get a full representation of the population. Certain marginalized groups might have less tendency to respond to these surveys. There is also a risk of social conformity bias, where respondents input higher incomes than what they earned. 
+
+## Data Overview and Cleaning 
+Graphs in this analysis are done with processed data. The data provided is all processed data under the NCHS folder [@icps], a possible explanation might be due to the restricted use, where a special request needs to be submitted. Moreover, data used in figure 1, 2  and 3 are all already compiled by CPS due to the large number of surveys. This is a major limitation that we face. Therefore, no cleaning is done as we do not have access to raw data. Some of the variables are:
+
+Brate_1519: Births per 1,000 women age 15–19
+
+Brate_2024: Births per 1,000 women age 20-24
+
+Brate_2529: Births per 1,000 women age 25-29
+
+Brate_3034: Births per 1,000 women age 30-34
+
+Brate_3539: Births per 1,000 women age 35-39
+
+Brate_4044: Births per 1,000 women age 40-44
+
+Brate_whitenh: Births per 1,000 White non-Hispanic women age 15–44
+
+Brate_blacknh: Births per 1,000 Black women age 15–44
+
+Brate_hisp: Births per 1,000 hispanic women age 15–44
+
+Hwsei_male_ftfy_colgrad_hisp: male full time full year college grad hourly salary mean average 
+ 
+Hwsei_female_ftfy_colgrad_hisp: female full time full year college grad hourly salary mean average 
+ 
+When calculating a child's expenditure in figure 8, we have first removed the non-available data. Then, 12 states are removed from the dataset because of missing data because child expenditure for both years need to be available to make a comparison. 
+
+
+## Exploratory Data Analysis
+Between 1980 and 2007, US birth rate fluctuates in between roughly 65 to 70 births per 1000 women. Starting from 2007, the green dotted line, the number of births has declined rapidly. Figure 1 demonstrates a decline in birth rate starting 2007, which is the subject of this paper. 
+
+```{r, echo=FALSE}
+library(readxl)
+fig_1 <- read.csv("144981-V1/data/fig_1.csv")
+figs_2 <- read.csv("144981-V1/data/figs_2a_2b.csv") %>%
+  select(year, brate_1519, brate_2024, brate_2529, brate_3034, brate_3539, brate_4044)
+figs_3 <- read.csv("144981-V1/data/figs_2a_2b.csv") %>%
+  select(year, brate_whitenh, brate_blacknh, brate_hisp)
+```
+
+Figure 1: Decline of Birth Rates in US
+
+```{r, echo=FALSE, warning=FALSE}
+ggplot(fig_1, aes(year, brate_all)) + xlab("Year") + ylab ("Births per 1,000 women age 15–44") + ggtitle("Trend in US Birth Rates") + geom_vline(xintercept = 2007, linetype="dotted", color="green", size = 1)+geom_line()
+```
+```{r, echo=FALSE}
+group<- tibble(figs_2$brate_1519, figs_2$brate_2024, figs_2$brate_2529, figs_2$brate_3034, figs_2$brate_3539,figs_2$brate_4044)
+```
+
+
+Figure 2: Decline of Birth Rates by Age Group
+
+```{r, echo=FALSE, warning=FALSE}
+ggplot(figs_2, aes(x=year)) + 
+  geom_line(aes(y = brate_1519, colour = "orange")) + geom_line(aes(y = brate_2024, colour = "blue"))  + geom_line(aes(y = brate_2529), colour = "green") + geom_line(aes(y = brate_3034), colour = "pink") + geom_line(aes(y = brate_3539), colour = "black") + geom_line(aes(y=brate_4044), colour = "purple") +
+  labs(x = "Year", y ="Births per 1,000 women age 15–44") + ggtitle("Birth Rates per Age Group") + geom_vline(xintercept = 2007, linetype="dotted", color="green", size = 1)
+
+```
+
+Figure 2 shows birth rate per six age group. We can see that starting 2007, there is a clear downward trend in birth rate. Birth rate has the sharpest decline for 15-19 years old and the downward decline trend for 20-24 years old have began a while before. Birth rate for women who are older (30-44) stays constant or has slightly increased. This graph is consistent with figure 1 where there is a sharp decline starting 2007. 
+
+
+Figure 3: Decline of Birth Rates by Race and Ethnicity
+
+```{r, warning=FALSE, echo=FALSE}
+ggplot(figs_3, aes(x=year)) +xlim(1990, 2020) + geom_line(aes(y=brate_whitenh, colour = "orange")) + geom_line(aes(y=brate_blacknh, colour = "blue")) + geom_line(aes(y=brate_hisp, colour = "green")) +  labs(x = "Year", y ="Births per 1,000 women age 15–44") + ggtitle("Birth Rates per Race and Ethnicity")+ geom_vline(xintercept = 2007, linetype="dotted", color="green", size = 1)
+
+```
+Figure 3 analyze birth rate per race and ethnicity. Hispanics are the ones who have the biggest decline in birth rate, the birth rate was 97.4 in 2007 and fell to 62.8 in 2020. Similarly, the birth rate for Black and White non-Hispanic Women also have fell starting 2007. It is interesting that this decline is less prominent than Hispanic women, but by 2020, the difference in birth race across ethnicity and race is much smaller. 
+
+# Results
+
+```{r, warning=FALSE, message=FALSE, echo= FALSE}
+wage04<- read_dta('144981-V1/data/long_term/longdiff-RHS-0408.dta')
+wage15<- read_dta('144981-V1/data/long_term/longdiff-RHS-1519.dta')
+rate<- read_dta('144981-V1/data/long_term/long_birth_rates.dta')
+child<-read_dta('144981-V1/data/long_term/child_care_costs_under12_0408_1519.dta')
+child2<-read_dta('144981-V1/data/long_term/child_care_costs_under12_0408_1519.dta')
+ur<- read_csv('144981-V1/data/UNRATE.csv')
+inc<- read_csv('144981-V1/data/MEHOINUSA672N.csv')
+```
+
+## Explanations for Macro Factors 
+Economics would explain the falling birth rate through the costs, utility and alternatives for having babies. Even though we can model fertility, the effect of the policies and the economic factors on the change in birth rates can be over-simplified. By looking at the historical trends from various demographic groups, the recession in 2008 was a turning point for all groups. The slope almost doubled in the declining trend. 
+
+The Great Recession started in December 2007 had severe economic, social, and demographic consequences across the entire world. The macro factors also dramatically changed due to the economic downturn. Unemployment rates, foreclosures on mortgages, and poverty rates all surged during this time of falling housing values.Fertility rates changed dramatically over the recession as well as shown in figure 1. The fertility rate declined nationally, from a recent high of 69.5 births per 1,000 women aged 15 to 44 in 2007 to 63.2 in 2012. The following paragraph will examine the effect of the recession on fertility rates from an economic perspective, including income effect and normal goods.
+
+Figure 3 shows that unemployment increased dramatically during the Great Recession in 2007 [@ufred]. Upon closer inspection on figure 1's trend, the fertility rate peaked and dropped in 1990 and 2000. It does not align with the unemployment rate data as the unemployment rate was relatively low in 1990 and 2000. 
+
+
+
+Figure 4: US Unemployment Rate from 1990 to 2020
+
+```{r, echo=FALSE}
+ur_plot<- ggplot(ur, aes(x=DATE, y=UNRATE)) + xlab("Year") + ylab ("Unemployment Rate") + ggtitle("Unemployment Rate") + geom_line()
+ur_plot
+```
+
+Figure 3 shows that the unemployment increased dramatically during the Great Recession in 2007 [@ufred]. Upon closer inspection on figure 1's trend, the fertility rate peaked and dropped in 1990 and 2000. It does not align with the unemployment rate data as the unemployment rate was relatively low in 1990 and 2000. However, the income seems to have closer relationship with the birthrate [@ifred]. The peaks are relatively similar among figure 1 and the household income plot. Even we do not know the causation relationship between income level and birth rates, we can say they are correlated. Without the research to take the income as independent variable, whether children can be considered as normal good cannot be decided.
+
+Figure 5: US Median Income from 1990 to 2020
+
+
+```{r, echo=FALSE}
+inc_plot<- ggplot(inc, aes(x=DATE, y=MEHOINUSA672N)) + xlab("Year") + ylab ("Real Median Household Income in US") + ggtitle("Real Median Household Income in US") + geom_line()
+inc_plot
+```
+
+```{r pressure, warning=FALSE, message=FALSE, echo= FALSE, results=FALSE}
+sort(wage04$statefip, decreasing=FALSE)
+sort(wage04$statefip, decreasing=FALSE)
+
+male04 <-wage04$hwsei_male_ftfy_colgrad_hisp + wage04$hwsei_male_ftfy_somecoll_hisp + wage04$hwsei_male_ftfy_hsgrad_hisp
+fm04<- wage04$hwsei_ftfy_colgrad_hisp + wage04$hwsei_ftfy_somecoll_hisp + wage04$hwsei_ftfy_hsgrad_hisp
+ratio04 <- fm04/male04
+
+male15 <-wage15$hwsei_male_ftfy_colgrad_hisp + wage15$hwsei_male_ftfy_somecoll_hisp + wage15$hwsei_male_ftfy_hsgrad_hisp
+fm15<- wage15$hwsei_ftfy_colgrad_hisp + wage15$hwsei_ftfy_somecoll_hisp + wage15$hwsei_ftfy_hsgrad_hisp
+ratio15 <- fm15/male15
+diff <- ratio15 -ratio04
+
+brate<- diff(rate$brate1544_thsnds, lag = 1 )
+brate<- brate[-2]
+brate<- brate[-3]
+brate<- brate[-4]
+brate<- brate[-5]
+brate<- brate[-6]
+brate<- brate[-7]
+brate<- brate[-8]
+brate<- brate[-9]
+brate<- brate[-10]
+brate<- brate[-11]
+brate<- brate[-12]
+brate<- brate[-13]
+brate<- brate[-14]
+brate<- brate[-15]
+brate<- brate[-16]
+brate<- brate[-17]
+brate<- brate[-18]
+brate<- brate[-19]
+brate<- brate[-20]
+brate<- brate[-21]
+brate<- brate[-22]
+brate<- brate[-23]
+brate<- brate[-24]
+brate<- brate[-25]
+brate<- brate[-26]
+brate<- brate[-27]
+brate<- brate[-28]
+brate<- brate[-29]
+brate<- brate[-30]
+brate<- brate[-31]
+brate<- brate[-32]
+brate<- brate[-33]
+brate<- brate[-34]
+brate<- brate[-35]
+brate<- brate[-36]
+brate<- brate[-37]
+brate<- brate[-38]
+brate<- brate[-39]
+brate<- brate[-40]
+brate<- brate[-41]
+brate<- brate[-42]
+brate<- brate[-43]
+brate<- brate[-44]
+brate<- brate[-45]
+brate<- brate[-46]
+brate<- brate[-47]
+brate<- brate[-48]
+brate<- brate[-49]
+brate<- brate[-50]
+brate<- brate[-51]
+```
+```{r, warning=FALSE, message=FALSE, echo= FALSE,results=FALSE}
+st<-rate$stname
+st<- st[-2]
+st<- st[-3]
+st<- st[-4]
+st<- st[-5]
+st<- st[-6]
+st<- st[-7]
+st<- st[-8]
+st<- st[-9]
+st<- st[-10]
+st<- st[-11]
+st<- st[-12]
+st<- st[-13]
+st<- st[-14]
+st<- st[-15]
+st<- st[-16]
+st<- st[-17]
+st<- st[-18]
+st<- st[-19]
+st<- st[-20]
+st<- st[-21]
+st<- st[-22]
+st<- st[-23]
+st<- st[-24]
+st<- st[-25]
+st<- st[-26]
+st<- st[-27]
+st<- st[-28]
+st<- st[-29]
+st<- st[-30]
+st<- st[-31]
+st<- st[-32]
+st<- st[-33]
+st<- st[-34]
+st<- st[-35]
+st<- st[-36]
+st<- st[-37]
+st<- st[-38]
+st<- st[-39]
+st<- st[-40]
+st<- st[-41]
+st<- st[-42]
+st<- st[-43]
+st<- st[-44]
+st<- st[-45]
+st<- st[-46]
+st<- st[-47]
+st<- st[-48]
+st<- st[-49]
+st<- st[-50]
+st<- st[-51]
+st<- st[-52]
+```
+
+
+```{r, warning=FALSE, message=FALSE, echo= FALSE, result= FALSE}
+figure<-tibble(a=st, b= brate, c=diff)
+```
+
+Figure 6: Female-male Wage Ratio and Birh Rates
+
+```{r, warning=FALSE, message=FALSE, echo= FALSE}
+ggplot(data= figure, aes(x = c, y = b)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  theme_minimal()+
+  geom_text(label=st, hjust=0, vjust=0)+
+  xlim(-0.08, 0.12)+
+  ylim(-20, 10)+
+  labs(title="Changing in female-male wage ratio and birth rate", x='Change in wage ratio', y='Change in birth rate')
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, echo= FALSE, results=FALSE}
+cor(brate, diff,  method = "pearson", use = "complete.obs")
+```
+
+
+## Explanations for Social Factors
+
+Through the continuous narrowing female-male wage gap, we want to verify if the change in wage gap is correlated with the declining birth rate. For the purpose of the research, the data for wages were collected from full-time full-year workers. We take all full-time workers from each state and take an average by each gender. We then sum up the average wage in each state from all education backgrounds. The wage ratio is calculated through dividing the sum for all females by male workers. The change in wage ratio between 2004 and 2019 is simply the difference between the 2004-2008 and 2015-2019 period. The table summarizes the characteristics of the change of female-male wage ratio. 
+
+Figure 7: Change of Female-male Wage Ratio from 2004-2008 to 2015-2019
+
+| Min        | Q1           | Median  |Mean  |Q3  |Max  |
+| -------- |-------------| -----| -----| -----| -----|
+| -0.135790 |-0.040866 |-0.010575 | 0.004585  |0.026665  |0.433062  |
+
+As the figure shows, the female-male wage ratio changes are slightly positively correlated with the declining birth rate. In the original paper, the wage ratio was calculated differently as the paper did not specify the specific variables used in the given dataset. The birth rate change among the states are identical to the paper. Overall speaking, despite the wage ratio for each state being different than in the figure shown in the original paper, the linear regression line exhibited the same slope.
+
+Upon conducting Pearson's correlation test for female-male wage ratio and the birth rate, the correlation coefficient is found to be 0.285527, aligned with the regression model, suggesting that the two variables have a weak relationship.
+
+```{r, warning=FALSE, message=FALSE, echo= FALSE}
+child<- child[order(child$stname),]
+child<- na.omit(child)
+child<-child[!(child$stname=="IA" |child$stname=="ID"|child$stname=="MS" |child$stname=="ME"|child$stname=="RI"|child$stname=="VT"),]
+ex<- diff(child$child2, lag = 1 )
+ex<- ex[-2]
+ex<- ex[-3]
+ex<- ex[-4]
+ex<- ex[-5]
+ex<- ex[-6]
+ex<- ex[-7]
+ex<- ex[-8]
+ex<- ex[-9]
+ex<- ex[-10]
+ex<- ex[-11]
+ex<- ex[-12]
+ex<- ex[-13]
+ex<- ex[-14]
+ex<- ex[-15]
+ex<- ex[-16]
+ex<- ex[-17]
+ex<- ex[-18]
+ex<- ex[-19]
+ex<- ex[-20]
+ex<- ex[-21]
+ex<- ex[-22]
+ex<- ex[-23]
+ex<- ex[-24]
+ex<- ex[-25]
+ex<- ex[-26]
+ex<- ex[-27]
+ex<- ex[-28]
+ex<- ex[-29]
+ex<- ex[-30]
+ex<- ex[-31]
+ex<- ex[-32]
+ex<- ex[-33]
+ex<- ex[-34]
+ex<- ex[-35]
+ex<- ex[-36]
+ex<- ex[-37]
+ex<- ex[-38]
+ex<- ex[-39]
+
+```
+
+
+```{r, results=FALSE, echo=FALSE}
+st2<-child$stname
+st2<- st2[-2]
+st2<- st2[-3]
+st2<- st2[-4]
+st2<- st2[-5]
+st2<- st2[-6]
+st2<- st2[-7]
+st2<- st2[-8]
+st2<- st2[-9]
+st2<- st2[-10]
+st2<- st2[-11]
+st2<- st2[-12]
+st2<- st2[-13]
+st2<- st2[-14]
+st2<- st2[-15]
+st2<- st2[-16]
+st2<- st2[-17]
+st2<- st2[-18]
+st2<- st2[-19]
+st2<- st2[-20]
+st2<- st2[-21]
+st2<- st2[-22]
+st2<- st2[-23]
+st2<- st2[-24]
+st2<- st2[-25]
+st2<- st2[-26]
+st2<- st2[-27]
+st2<- st2[-28]
+st2<- st2[-29]
+st2<- st2[-30]
+st2<- st2[-31]
+st2<- st2[-32]
+st2<- st2[-33]
+st2<- st2[-34]
+st2<- st2[-35]
+st2<- st2[-36]
+st2<- st2[-37]
+st2<- st2[-38]
+st2<- st2[-39]
+st2<- st2[-40]
+```
+
+```{r, warning=FALSE, message=FALSE, echo= FALSE}
+brate2<-rate[!(rate$stname=="IA" |rate$stname=="ID"|rate$stname=="MS" |child$stname=="ME"|rate$stname=="RI"|rate$stname=="VT"|rate$stname=="MT"| rate$stname=="AR"|rate$stname=="ND"|rate$stname=="RI"|rate$stname=="NH"|rate$stname=="NM"|rate$stname=="SD"|rate$stname=="WY"),]
+r<- diff(brate2$brate1544_thsnds, lag = 1 )
+r<- r[-2]
+r<- r[-3]
+r<- r[-4]
+r<- r[-5]
+r<- r[-6]
+r<- r[-7]
+r<- r[-8]
+r<- r[-9]
+r<- r[-10]
+r<- r[-11]
+r<- r[-12]
+r<- r[-13]
+r<- r[-14]
+r<- r[-15]
+r<- r[-16]
+r<- r[-17]
+r<- r[-18]
+r<- r[-19]
+r<- r[-20]
+r<- r[-21]
+r<- r[-22]
+r<- r[-23]
+r<- r[-24]
+r<- r[-25]
+r<- r[-26]
+r<- r[-27]
+r<- r[-28]
+r<- r[-29]
+r<- r[-30]
+r<- r[-31]
+r<- r[-32]
+r<- r[-33]
+r<- r[-34]
+r<- r[-35]
+r<- r[-36]
+r<- r[-37]
+r<- r[-38]
+r<- r[-39]
+r<- r[-40]
+```
+
+
+```{r, warning=FALSE, message=FALSE, echo= FALSE, results=FALSE}
+figure2<-tibble(a=st2, b=r,c=ex)
+```
+
+Figure 8: Childcare Expenditure and Birth Rates
+
+```{r, warning=FALSE, message=FALSE, echo= FALSE}
+ggplot(data= figure2, aes(x = c, y = b)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  theme_minimal()+
+  geom_text(label=st2, hjust=0, vjust=0)+
+  xlim(0, 5000)+
+  ylim(-20, 10)+
+  labs(title="Changing in Childcare expenditures", x='Change in expenditures', y='Change in birth rate')
+```
+
+```{r, results=FALSE, echo=FALSE}
+cor(r, ex,  method = "pearson", use = "complete.obs")
+```
+
+Families have to evaluate the benefits and the costs of having a child. Those factors can directly impact the decision to whether to have a child or not. The intuition is that the rising cost of raising a child will decrease birth rates. The survey data collected from Annual Social and Economic Supplement indicate that the correlation between the rise of child expenditures and birth rates is very low. In the figure shown, the regression line has a flat slope. The coefficient of correlation is 0.08806. We can conclude that there is no relationship between the rising cost of having a child and the declining birth rates.
+
+## Explanations for Demographic Factors:
+
+The aging population is one potential explanation for the decline of the birth rate, as we assume that fertility decreases as the population ages. In fact, as shown in figure 2, we see a rise of birth rates in age groups 35-39 and 40-44. Their birth rates increased during the 1980 and 2020 period (@nvss). The younger age groups' births declined heavily since the recession in 2007,especially women age between 20-30. We can say that the decline is mostly contributed by the younger section of the demographics. Thus, it cannot be a factor due to the aging population. 
+
+Furthermore, we explore how birth changes according to race groups. White, non-hispanic women showed little decrease in birth rate overtime, maintained around 60%. We see greater decline in hispanic and non-hispanic black people. Over 30 years, hispanic people's births decreased by 50 women who gave birth out of 1000 women surveyed. The paper by Melissa et al. suggests that reason behind the fall in hispanic woman's birth rate is relevant to the fallen Mexican birth rate. Another approach is to look at the total proportion of the population relative to the birth rate. According to Vital Statistics Surveillance Report, the number of births of white women had 1,839,565 births in 2020 and only 863,949 births for hispanic women. Even if the sharper decline from previous year is due to cultural reasons behind the ethnicity, there is a possibility that as inter-racial marriage gets more common, the cultural effect on the birth rates may be impacted.
+
+Another theory posed by Zaidi and Morgan [@seconddemo], the second demographic transition, has an nonlinear change towards lower birth rates and various family types. Their review on the theory suggests that the dramatic changes in women's attitudes and norms are heavily impacting the fertility rate. The common beliefs also change the family behaviors in he U.S. While Melissa et al. mentions that the theory has been widely applied to the European context [@paper], Zaidi and Mogan have pointed out that the theory failed to compare many contemporary patterns. We can say that this model is unlikely to have a convincing say in the decline of birth rates. 
+
+
+In addition to the potential change in beliefs, another research by Hartnett and Gemmil found that the current childbearing cohort will likely to have less children compared to before [@numchild]. The National Survey of Family Growth research says that during the previous 20 years, more young women want to remain childless. The change was not due to an demographic change in the population [@paper]. The change in specific demographic groups such as race, are more notable. Their findings are aligned with the previous analysis in this paper. Among all groups, the fall is more notable in hispanic teenagers. Even though there was a change in people's desired number of children, the change was only 0.1, from 2.26 children to 2.16 from 2006 to 2017. Thus, this suggest that beliefs among the population is less of a factor in contributing to the fall in birth rates. 
+
+#Discussion
+
+## During The Great recession
+
+The original article conducts an in-depth examination of the factors that contributed to the drop in US birth rates from the viewpoints of numerous economic models, the economic environment, such as the great recession, and theories. In this replication paper, the aspect of the great recession in the economic field was selected to focus on digging the reasons behind the decline in US birth rates.
+
+## Income Effect & Normal Goods
+
+Income effect refers to the phenomenon in which a change in income or wealth has a consequent influence on demand. When income levels of consumers decrease, they will consume less. This might be accomplished by higher price, hence raising consumer cost, or by decreasing salaries or losing jobs. In economics, when income increases or the economy is expanding, demand for inferior goods drops. When this occurs, buyers will be more inclined to pay a premium for more expensive alternatives. Normal goods are goods that see their demand rise as consumers' incomes grow, while assuming increasing income will subsequently increase the fertility rate. 
+
+According to [@iwgb], the richest Americans lost the most wealth in absolute terms, while the middle class lost the most wealth in percentage terms. Individuals in the 50th percentile lost 23% of their wealth, while those in the 90th and 99th percentiles lost 13% and 20%, correspondingly. Low-income households, who typically have fewer assets, have also lost some wealth, but not as much as middle-class families. As a consequence, the US unemployment rate has skyrocketed. Numerous American employees have been laid off, and countless families have been deprived of their main source of income and support.
+
+It is obvious that The Great Recession has decimated the wealth and income of Americans across the whole country. Since children are assumed to be normal goods, which’s demand has a positive correlation with income level. Due to the income effect, with price, quality and all others holding constant, as income and wealth decrease, consumers tend to  demand less normal goods. Consequently, Americans choose to have fewer children during The Great Recession period. 
+
+
+## After The Great Recession
+
+### Price Effect & Cost
+Beyond The Great Recession, the birth rate continuously fell a lot. While the recession undoubtedly contributed to that drop, other variables must have been at work as well. The absence of any comeback in births and, in fact, their sustained decrease after the recession's conclusion further demonstrates that forces other than the Great Recession are at work. The following paragraph will demonstrate how some social factors could affect the birth rate after the depression period from an economic point of view.
+
+By approach of the price effect, expenditure and opportunity cost are main factors to analyze people’s decision of having children. The price effect is an idea that examines how market prices change consumer demand. The pricing effect may be a critical factor for corporations when determining the price at which they will provide their products and services. Buyers often purchase less when prices increase, and conversely when prices decrease.
+
+Annual expenditures on childcare for families with children can be considered as the price to have children. According to the price effect, when expenditures on childcare go up, having children becomes more expensive, as a rational consumer, people tend to have less children.Adriann Kalwj shows that there exists a negative correlation between child care expenditure and fertility rate, which further explains as the cost of having a child rises, the birth rate decreases [@tifpe]. Consequently, by price effect, the growth of annual expenditures on childcare is a potential reason for the fertility rate decline. However, based on the sample data collected by original data, the scatter plot regarding the birth rate and annual expenditures on childcare for families with children doesn’t show a significant drop on birth rate as expenditures on childcare increase. 
+
+Except expenditures on childcare for families which is a kind of cost to evaluate the price effect in the form of explicit expense, opportunity cost is also a significant economic terminology to measure price effect, but it is implicit. When a choice is taken, the opportunity cost is the worth of the next-best option. It is what is given up. opportunity cost plays an important role in total cost. Normally, as opportunity costs increase, total cost rises, consequently, the price increases as well.
+
+Women can either invest their time in having babies or working to earn money. The opportunity cost for women to have children is the wages they gave up. Therefore, as the salaries of women increase, the opportunity cost to have children increases as well. Due to the price effect, people should work more and have less children. In this way, the employment rate and the wages level of women are negatively related to birth rate. This relationship has been proved by [@ferf]. However, based on sample data of the original paper, the scatter plot doesn’t illustrate a negative linear relationship between the female-to-male median earnings ratio among full-time and birth rate.
+
+
+### Decomposing the Decline in Birth Rates into Between- and Within-Demographic Groups
+Changing birth rates and the number of women of reproductive age have an impact on the contribution of each demographic group to the overall population. Even if no demographic group's birth rates changed, population migration to lower-birth-rate groups would result in a fall in the aggregate birth rate as a consequence of population mobility. The decreases in birth rates that have occurred since 2007 may be divided into two categories: dips in various demographic groups and changes in population proportions.
+
+During the period 2007 to 2019, there was a significant decrease in fertility rates. A large portion of this may be attributed to the variance in birth rates across various demographic groupings. The total birth rate would have been decreased by 12.8 births per 1,000 women if population shares had remained constant in this scenario, according to this hypothesis. 
+
+## Limitation
+
+### Method 
+
+In the original paper, children are considered as normal goods, which follows positive movement along with raising income. However, it is true that in most developed countries, the birth rate is less than in developing countries. Obviously, overall, in developed countries people are richer than developing countries. It seems that this fact doesn’t follow economic behavior, if children are normal goods. 
+
+According to [@MatthewWoolf], there has been much argument about whether children are normal goods or inferior goods, especially in light of the overall trend toward decreased fertility as a country's population becomes wealthier. However, assessing whether children are normal goods is challenging since income rises seldom occur in isolation from other complicating factors. According to [@studentnovasbe],  we can observe that poorer people have more children than richer people, which proves that in economic terms, this makes children an inferior good. However, based on research during the four years surrounding the financial crisis in Indonesia, they find children appear to be neither inferior goods nor normal goods [@Farkouh]. There is still some debate in economics on whether children should be classified as normal or inferior goods. This manner, the investigation of the reasons for the drop in fertility will be influenced to some degree by the assumption that children are normal goods.
+
+### Data & Graph replication
+
+The original paper did not observe the basic reproducibility rule. The original README didn’t include detailed information about the specific variables used in the dataset provided and the detailed explanation to the meaning of each data variable. Moreover, the authors of the original paper did not mention which method they used to do so, how they processed the raw data before they started to produce graphs and which processed variables were used to produce the relative graph or table. Those information plays a significant role in paper and graph replication, however all of them were missing, which brings much more difficulties during our replication process and makes our replication result not identical in figure 6 and figure 8. 
+
+# Conclusion
+The decline of U.S birth rate brings both advantages and disadvantages. From the positive side, fewer births may have some positive consequences, since it opens up more options for women.  From another side, as a consequence of an aging population and a shrinking labor force, a range of roadblocks have been put in the way of economic development and the implementation of social security systems.Investing extensively in human capital as well as productivity-enhancing infrastructure is the most effective strategy for reversing the declining trend in the population in the United States.
+
+\newpage
+
+# Reference 
